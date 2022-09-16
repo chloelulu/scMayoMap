@@ -66,7 +66,7 @@ markers <- obj$markers
 head(markers)
 ```
 
-scMayoMap also supplies a plot function to help you visualize the result. You can supply your own directory(i.e., directory = '~/Desktop/'), otherwise plot will be automatically saved to the current working directory (default is "directory = NULL").
+scMayoMap also supplies a plot function to help you visualize the result. You can supply your own directory(i.e., directory = '~/Desktop/'), otherwise plot will be automatically saved to the current working directory (default is "directory = NULL"). User needs to adjust "width" and "height" based on your expected figure size.
 ```{r, fig.retina = 4, fig.width= 7, fig.height=5, results=FALSE, message=FALSE, warning=FALSE}
 plt <- scMayoMap.plot(scMayoMap.object = obj, directory = '~/Desktop/', width = 8, height = 6)
 ```
@@ -101,4 +101,3 @@ DotPlot(seurat.obj, features = gns)
 
   - Lu Yang, Yan Er Ng, Haipeng Sun, Ying Li, Nathan LeBrasseur, Jun Chen, Xu Zhang. Single-cell Mayo Map (scMayoMap), an easy-to-use tool for mapping cell types in single-cell RNA-sequencing data analysis. Submitted.
 
-# scMayoMap
