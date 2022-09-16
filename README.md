@@ -46,10 +46,10 @@ obj <- scMayoMap(data = data, tissue = 'muscle')
 
 User can also define their own database as input. For [example](https://github.com/chloelulu/scMayoMap/blob/main/data/demo.marker.Rdata), if you want to use your own marker pool. The database should be in the same format as scMayoMapDatabase. Presence of a gene in a celltype will be 1, otherwise 0. column names should contain 'gene' column. Currently, our database only supports gene symbols. If you have a data with Ensembl ID, please refer [biomaRt](https://bioconductor.org/packages/release/bioc/html/biomaRt.html) or other methods to convert the gene names. 
 ```{r, message=FALSE, warning=FALSE}
-load('data/demo.marker.Rdata')
+head(demo.marker)
 db <- tidyr::spread(demo.marker, key = c('celltype'), value = 'value')
 db[is.na(db)] <- 0
-obj <- scMayoMap(data = data, database = database)
+obj <- scMayoMap(data = data, database = db)
 ```
 
 
