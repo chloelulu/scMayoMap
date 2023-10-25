@@ -1,15 +1,9 @@
-require(ggplot2)
-require(dplyr)
-require(tidyr)
-require(tibble)
-require(reshape2)
 
 #' @title Calculate the cumulative variance of a vector
 #' @param x a vector
 #' @return {v}{a vector of cumulative variance}
 #' @rdname cumvar
 #' @import stats
-#' @export
 cumvar <- function(x){
   x <- x - x[sample.int(length(x), 1)]
   n <- seq_along(x)
@@ -18,26 +12,56 @@ cumvar <- function(x){
 }
 
 
-utils::globalVariables(c("celltype", "cluster", "cell","score"))
+utils::globalVariables(c("celltype", "cluster", "cell","score", "scMayoMapDatabase"))
+
+#' An illustrative user-supplied marker pool
+#' This dataset serves as a demonstration and includes a collection of user-specified marker pools.
+#' @docType data
+#' @usage data(demodata)
+#' @format A data frame with 3 columns:
+#' \describe{
+#'   \item{gene}{Names of marker genes}
+#'   \item{celltype}{Names of cell types}
+#'   \item{value}{A column populated with the value of 1, signifying the presence of the corresponding marker gene for the respective cell type}
+#' }
+#' @examples
+#' # If 'demodata' is your marker pool, use the code below to modify the marker
+#' # pool into the database format required by scMayoMap:
+#' library(scMayoMap)
+#' data(demodata)
+#' db <- tidyr::spread(demodata, key = c('celltype'), value = 'value')
+#' db[is.na(db)] <- 0
+#' obj <- scMayoMap(data = data, database = db)
+"demodata"
+
+
+#' scMayoMapDatabase
+#' The default databse for scMayoMap. A data.frame lists all marker genes for each cell type in a variety of tissues.
+#' @docType data
+#' @usage data(scMayoMapDatabase)
+#' @examples
+#' data(scMayoMapDatabase)
+"scMayoMapDatabase"
 
 
 #' @title scMayoMap
-#' @param data data frame. Rows: gene names; columns must include "avg_log2FC", "pct.1","pct.2", "gene".
-#' @param database data frame. Already cleaned database saved in the package.
-#' @param tissue tissue to be specified. If NULL, tissue will not be specified. User can choose one of:
+#' @description This function is crafted to annotate cell clusters in single-cell RNA-Seq data and is particularly tailored to enhance the downstream analysis of the Seurat workflow. Additionally, it is versatile enough to accommodate the downstream analysis of other tools, provided the input format is compatible.
+#' @param data A data frame where rows represent genes and columns include "avg_log2FC", "pct.1", "pct.2", and "gene". The "avg_log2FC" column indicates the log fold-change of average expression between each cell cluster and all others. Columns "pct.1" and "pct.2" display the percentage of cells in which the feature is detected in each cell cluster and all others, respectively. The "gene" column contains the gene names. For more details, refer to outputs of \link[Seurat]{FindAllMarkers}.
+#' @param database data frame. If NULL (default), the function will automatically use the default scMayoMapDatabase. Users can also provide their own set of markers, ensuring that they are formatted similarly to scMayoMapDatabase, see \link[scMayoMap]{scMayoMapDatabase} and \link[scMayoMap]{demodata}.
+#' @param tissue The tissue name to be specified.  If NULL, no tissue will be specified. Currently, scMayoMapDatabase includes the following tissues:
 #'                "adipose tissue"; "bladder"; "blood"; "bone"; "bone marrow";
 #'                "brain";"breast"; "embryo"; "eye"; "gastrointestinal tract";
 #'                "heart";"kidney";"liver";"lung";"mammary gland";"muscle";
 #'                "other";"ovary";"pancreas";"placenta";"prostate";
 #'                "skin";"spleen";"stomach";"testis";"thymus";"tooth";"uterus".
-#' @param padj.cutoff number between 0-1. Used to filter the genes by FDR adjusted pvalue.
-#' @param pct.cutoff number between 0-1. Genes with pct.1 greater than this number will be remained for later analysis.
+#' @param padj.cutoff A numerical value between 0 and 1 indicating the significance level for keep the differential genes as input for scMayoMap. Default is 0.05.
+#' @param pct.cutoff A numerical value between 0 and 1. Genes with pct.1 greater than this number will be remained for later analysis.
 #' @return A list with the elements
-#' \item{res}{A data.frame listed cluster("cluster") with the top N potential celltypes("celltype") with estimated scores "ES.raw", standard errors "ES.se", normalized estimated scores "ES.norm", and markers matched for predicted cell type.}
-#' \item{markers}{A data.frame of cell types scores of each cluster. Row: cluster, Column: annotated cell types.}
-#' \item{tissue}{tissue specified in the analysis.}
-#' \item{annotation.norm}{A data.frame of cell types scores of each cluster. Row: cluster, Column: annotated cell types.}
-#' \item{annotation.mean}{A data.frame of cell types mean of each cluster. Row: cluster, Column: annotated cell types.}
+#' \item{res}{A data frame that includes the cluster ("cluster") associated with the top N potential cell types ("celltype"), along with the estimated scores "ES.raw", standard errors "ES.se", normalized estimated scores "ES.norm", and markers matched for the predicted cell type.}
+#' \item{markers}{A data frame containing the scores of cell types for each cluster. Row: cluster, Column: annotated cell type.}
+#' \item{tissue}{The tissue names specified in the analysis.}
+#' \item{annotation.norm}{A data frame containing the scores of cell types for each cluster. Row: cluster, Column: annotated cell type.}
+#' \item{annotation.mean}{A data frame containing the mean scores of cell types for each cluster. Row: cluster, Column: annotated cell type.}
 #' @rdname scMayoMap
 #' @importFrom dplyr summarise
 #' @importFrom dplyr %>%
@@ -47,10 +71,21 @@ utils::globalVariables(c("celltype", "cluster", "cell","score"))
 #' @importFrom stats na.omit
 #' @importFrom stats sd
 #' @export scMayoMap
-#'
+#' @author Lu Yang and Xu Zhang
+#' @references Lu Yang, Yan Er Ng, Haipeng Sun, Ying Li, Lucas C. S. Chini, Nathan K. LeBrasseur, Jun Chen & Xu Zhang. Single-cell Mayo Map (scMayoMap): an easy-to-use tool for cell type annotation in single-cell RNA-sequencing data analysis. BMC Biol 21, 223 (2023). https://doi.org/10.1186/s12915-023-01728-6.
+#' @examples
+#' pkgs <- c("ggplot2", "dplyr","tidyr","tibble","reshape2")
+#' sapply(pkgs, require, character.only = TRUE)
+#' library(scMayoMap)
+#' data(data)
+#' obj <- scMayoMap(data = data, tissue = 'muscle')
+
 scMayoMap <- function(data, database=NULL, padj.cutoff = 0.05, pct.cutoff = 0.25, tissue = NULL){
+
   if(is.null(database)){
     database = scMayoMapDatabase
+  }else{
+    cat('User defined marker pool will be used!\n')
   }
 
   ## Define tissue or not
@@ -60,21 +95,20 @@ scMayoMap <- function(data, database=NULL, padj.cutoff = 0.05, pct.cutoff = 0.25
     db <- (database[database$tissue==tissue,,drop =F])[,!(colnames(database) %in% 'tissue')]
   }
   data1 <- data
-  # data1$cluster <- paste0('Cluster ', data1$cluster)
   colnames(data1)[grep('log',colnames(data1))] = "avg_log2FC"
 
   ## Filter gene by cutoffs
   data1 <- data1[data1$p_val_adj <= padj.cutoff & data1$pct.1 >= pct.cutoff,]
   data1$gene <- toupper(data1$gene)
 
-  ## Match the data1base
+  ## Match the database
   min.pct2 <- min(data1$pct.2[data1$pct.2>0])
   data1$Score <- ifelse(data1$pct.2 !=0, (2^data1$avg_log2FC * data1$pct.1)/data1$pct.2,(2^data1$avg_log2FC * data1$pct.1)/min.pct2)
   merged <- na.omit(merge(x=data1[,c('cluster','gene','Score')], y=db, all.y = TRUE))
   merged[,!(colnames(merged) %in% c('gene','Score','cluster'))] <- sapply(merged[,!(colnames(merged) %in% c('gene','Score','cluster'))], function(x) merged$Score * x )
   merged1 <- merged[,!(colnames(merged) %in% c('gene','Score')), drop =F]
 
-  ## Calculate the mean value(dplyr is faster than baseR)
+  ## Calculate the mean value
   annotation.mean <- as.data.frame(summarise(group_by(merged1, cluster),across(everything(), mean)))
   annotation.se <- as.data.frame(summarise(group_by(merged1, cluster), across(everything(), function(x) sd(x)/sqrt(length(x)))))
   rownames(annotation.mean) <- annotation.mean$cluster
@@ -86,7 +120,6 @@ scMayoMap <- function(data, database=NULL, padj.cutoff = 0.05, pct.cutoff = 0.25
   annotation.norm <- annotation.mean / rowSums(annotation.mean)
   if(sum(is.na(annotation.norm)) > 0){cat('Caution: some clusters can not match db!')}
   annotation.norm[is.na(annotation.norm)] <- 0
-
 
   ## Summarize the top.n possible cell types
   top.n <- sapply(1:nrow(annotation.norm),  function (i) {
@@ -111,7 +144,7 @@ scMayoMap <- function(data, database=NULL, padj.cutoff = 0.05, pct.cutoff = 0.25
   colnames(top.n) <- c('celltype','ES.norm','ES.raw','ES.se','cluster')
   rownames(top.n) <- NULL
 
-  ## save marker genes for mapped cell type for Seurat Dotplot
+  ## save marker genes for mapped cell type for Dotplot
   mk.lst <- list()
   for(k in top.n$cluster){
     clt <- top.n$celltype[top.n$cluster==k]
@@ -149,11 +182,12 @@ scMayoMap <- function(data, database=NULL, padj.cutoff = 0.05, pct.cutoff = 0.25
 
 
 
-#' @title plot the annotation result of scMayoMap
-#' @param scMayoMap.object return from function \code{scMayoMap}.
-#' @param directory character. the directory to save the figures. Default is the current working directory.
-#' @param width the width of the graphics region in inches. See R function \code{pdf}.
-#' @param height the height of the graphics region in inches. See R function \code{pdf}.
+#' @title Visualize scMayoMap Annotation Results
+#' @description This function creates a dot plot visualizing the annotated cell types for cell clusters, utilizing the output from scMayoMap.
+#' @param scMayoMap.object The result object returned from the function \code{scMayoMap}.
+#' @param directory A character string indicating the directory where the figures will be saved. By default (NULL), it is set to the current working directory.
+#' @param width Specifies the width of the graphics region in inches. Refer to the R function \code{pdf}.
+#' @param height Specifies the height of the graphics region in inches. Refer to the R function \code{pdf}.
 #' @return
 #' \item{annotation.plot}{A ggplot object}
 #' @importFrom dplyr %>%
@@ -167,7 +201,15 @@ scMayoMap <- function(data, database=NULL, padj.cutoff = 0.05, pct.cutoff = 0.25
 #' @importFrom utils globalVariables
 #' @rdname scMayoMap.plot
 #' @export scMayoMap.plot
-#'
+#' @author Lu Yang
+#' @references Lu Yang, Yan Er Ng, Haipeng Sun, Ying Li, Lucas C. S. Chini, Nathan K. LeBrasseur, Jun Chen & Xu Zhang. Single-cell Mayo Map (scMayoMap): an easy-to-use tool for cell type annotation in single-cell RNA-sequencing data analysis. BMC Biol 21, 223 (2023). https://doi.org/10.1186/s12915-023-01728-6.
+#' @examples
+#' pkgs <- c("ggplot2", "dplyr","tidyr","tibble","reshape2")
+#' sapply(pkgs, require, character.only = TRUE)
+#' library(scMayoMap)
+#' data(data)
+#' obj <- scMayoMap(data = data, tissue = 'muscle')
+#' plt <- scMayoMap.plot(scMayoMap.object = obj, directory = '~/Desktop/', width = 8, height = 6)
 
 scMayoMap.plot <- function(scMayoMap.object, directory = NULL, width = 8, height = 6){
   annotation.mean <- scMayoMap.object$annotation.mean
@@ -182,7 +224,6 @@ scMayoMap.plot <- function(scMayoMap.object, directory = NULL, width = 8, height
   if(!is.null(scMayoMap.object$tissue)){
     mt.annotation$cell <- gsub('.*:','',mt.annotation$cell)
     MaxCell.Cluster <- gsub('.*:','',MaxCell.Cluster)
-
   }
 
   ## prepare circle (top n data)
@@ -195,7 +236,7 @@ scMayoMap.plot <- function(scMayoMap.object, directory = NULL, width = 8, height
   score1 <- score1[,!(colnames(score1) %in% 'match')]
 
   if(ncol(tmp.df) <=3){
-    cat('No biased celltype can be found.')
+    cat('No biased celltype can be found.\n')
     plot.top = 1
   }else{
     tmp.df2 <- tmp.df[,c('cluster','2')]
@@ -219,7 +260,6 @@ scMayoMap.plot <- function(scMayoMap.object, directory = NULL, width = 8, height
                      geom_point(data = score1, aes(x=cluster,y=cell, size=score), shape = 21, color = 'red') +
                      theme_bw() +
                      labs(title= "", x="cluster", y="", caption = "Dot size also represents the score\nRed circle highlights top1 score\n Blue circle notates the 2nd top score") +
-                     # labs(title= "", x="", y="", caption = "Dot size also represents the score\nRed circle highlights top1 score") +
                      theme(axis.text = element_text(color = 'black', size = 14),
                            axis.text.x = element_text(color = 'black', size = 14),
                            axis.title = element_text(color = 'black', size = 14),
