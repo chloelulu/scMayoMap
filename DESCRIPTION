@@ -1,14 +1,14 @@
 Package: scMayoMap
 Type: Package
-Title: This package implements cluster annotation of scRNA-seq data
-Version: 0.1.0
+Title: Single-cell Mayo Map(scMayoMap)
+Version: 0.2.0
 Author: Lu Yang, Xu Zhang
 Maintainer: Lu Yang <luyang1005@gmail.com>
-Description: Single-cell Mayo Map is an easy-to-use tool for cell type annotation in single-cell RNA-sequencing data analysis.
+Description: It is a user-friendly tool crafted for annotating cell types in Single-cell RNA-Seq data analysis. It enhances the simplicity and effectiveness of cell type annotation in scRNA-seq data. For further insights, refer to the study by: Yang, L., Ng, Y.E., Sun, H. et al. Single-cell Mayo Map (scMayoMap): an easy-to-use tool for cell type annotation in single-cell RNA-sequencing data analysis. BMC Biol 21, 223 (2023). 
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.3
 Imports:
     dplyr,
     tidyr,
@@ -18,4 +18,4 @@ Imports:
     tibble,
     utils
 Depends: 
-    R (>= 2.10)
+    R (>= 3.5.0)

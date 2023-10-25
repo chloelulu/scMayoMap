@@ -13,15 +13,15 @@ scMayoMap(
 )
 }
 \arguments{
-\item{data}{data frame. Rows: gene names; columns must include "avg_log2FC", "pct.1","pct.2", "gene".}
+\item{data}{A data frame where rows represent genes and columns include "avg_log2FC", "pct.1", "pct.2", and "gene". The "avg_log2FC" column indicates the log fold-change of average expression between each cell cluster and all others. Columns "pct.1" and "pct.2" display the percentage of cells in which the feature is detected in each cell cluster and all others, respectively. The "gene" column contains the gene names. For more details, refer to outputs of \link[Seurat]{FindAllMarkers}.}
 
-\item{database}{data frame. Already cleaned database saved in the package.}
+\item{database}{data frame. If NULL (default), the function will automatically use the default scMayoMapDatabase. Users can also provide their own set of markers, ensuring that they are formatted similarly to scMayoMapDatabase, see \link[scMayoMap]{scMayoMapDatabase} and \link[scMayoMap]{demodata}.}
 
-\item{padj.cutoff}{number between 0-1. Used to filter the genes by FDR adjusted pvalue.}
+\item{padj.cutoff}{A numerical value between 0 and 1 indicating the significance level for keep the differential genes as input for scMayoMap. Default is 0.05.}
 
-\item{pct.cutoff}{number between 0-1. Genes with pct.1 greater than this number will be remained for later analysis.}
+\item{pct.cutoff}{A numerical value between 0 and 1. Genes with pct.1 greater than this number will be remained for later analysis.}
 
-\item{tissue}{tissue to be specified. If NULL, tissue will not be specified. User can choose one of:
+\item{tissue}{The tissue name to be specified.  If NULL, no tissue will be specified. Currently, scMayoMapDatabase includes the following tissues:
 "adipose tissue"; "bladder"; "blood"; "bone"; "bone marrow";
 "brain";"breast"; "embryo"; "eye"; "gastrointestinal tract";
 "heart";"kidney";"liver";"lung";"mammary gland";"muscle";
@@ -30,12 +30,25 @@ scMayoMap(
 }
 \value{
 A list with the elements
-\item{res}{A data.frame listed cluster("cluster") with the top N potential celltypes("celltype") with estimated scores "ES.raw", standard errors "ES.se", normalized estimated scores "ES.norm", and markers matched for predicted cell type.}
-\item{markers}{A data.frame of cell types scores of each cluster. Row: cluster, Column: annotated cell types.}
-\item{tissue}{tissue specified in the analysis.}
-\item{annotation.norm}{A data.frame of cell types scores of each cluster. Row: cluster, Column: annotated cell types.}
-\item{annotation.mean}{A data.frame of cell types mean of each cluster. Row: cluster, Column: annotated cell types.}
+\item{res}{A data frame that includes the cluster ("cluster") associated with the top N potential cell types ("celltype"), along with the estimated scores "ES.raw", standard errors "ES.se", normalized estimated scores "ES.norm", and markers matched for the predicted cell type.}
+\item{markers}{A data frame containing the scores of cell types for each cluster. Row: cluster, Column: annotated cell type.}
+\item{tissue}{The tissue names specified in the analysis.}
+\item{annotation.norm}{A data frame containing the scores of cell types for each cluster. Row: cluster, Column: annotated cell type.}
+\item{annotation.mean}{A data frame containing the mean scores of cell types for each cluster. Row: cluster, Column: annotated cell type.}
 }
 \description{
-scMayoMap
+This function is crafted to annotate cell clusters in single-cell RNA-Seq data and is particularly tailored to enhance the downstream analysis of the Seurat workflow. Additionally, it is versatile enough to accommodate the downstream analysis of other tools, provided the input format is compatible.
+}
+\examples{
+pkgs <- c("ggplot2", "dplyr","tidyr","tibble","reshape2")
+sapply(pkgs, require, character.only = TRUE)
+library(scMayoMap)
+data(data)
+obj <- scMayoMap(data = data, tissue = 'muscle')
+}
+\references{
+Lu Yang, Yan Er Ng, Haipeng Sun, Ying Li, Lucas C. S. Chini, Nathan K. LeBrasseur, Jun Chen & Xu Zhang. Single-cell Mayo Map (scMayoMap): an easy-to-use tool for cell type annotation in single-cell RNA-sequencing data analysis. BMC Biol 21, 223 (2023). https://doi.org/10.1186/s12915-023-01728-6.
+}
+\author{
+Lu Yang and Xu Zhang
 }

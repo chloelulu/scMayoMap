@@ -1,6 +1,0 @@
-load('data-raw/database.Rdata')
-usethis::use_data(scMayoMapDatabase, compress = 'xz', overwrite = T)
-load('inst/extdata/data.rda')
-usethis::use_data(data, compress = 'xz', overwrite = T)
-load('data-raw/demodata.Rdata')
-usethis::use_data(demodata, compress = 'xz', overwrite = T)

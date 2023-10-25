@@ -2,22 +2,36 @@
 % Please edit documentation in R/scMayoMap.R
 \name{scMayoMap.plot}
 \alias{scMayoMap.plot}
-\title{plot the annotation result of scMayoMap}
+\title{Visualize scMayoMap Annotation Results}
 \usage{
 scMayoMap.plot(scMayoMap.object, directory = NULL, width = 8, height = 6)
 }
 \arguments{
-\item{scMayoMap.object}{return from function \code{scMayoMap}.}
+\item{scMayoMap.object}{The result object returned from the function \code{scMayoMap}.}
 
-\item{directory}{character. the directory to save the figures. Default is the current working directory.}
+\item{directory}{A character string indicating the directory where the figures will be saved. By default (NULL), it is set to the current working directory.}
 
-\item{width}{the width of the graphics region in inches. See R function \code{pdf}.}
+\item{width}{Specifies the width of the graphics region in inches. Refer to the R function \code{pdf}.}
 
-\item{height}{the height of the graphics region in inches. See R function \code{pdf}.}
+\item{height}{Specifies the height of the graphics region in inches. Refer to the R function \code{pdf}.}
 }
 \value{
 \item{annotation.plot}{A ggplot object}
 }
 \description{
-plot the annotation result of scMayoMap
+This function creates a dot plot visualizing the annotated cell types for cell clusters, utilizing the output from scMayoMap.
+}
+\examples{
+pkgs <- c("ggplot2", "dplyr","tidyr","tibble","reshape2")
+sapply(pkgs, require, character.only = TRUE)
+library(scMayoMap)
+data(data)
+obj <- scMayoMap(data = data, tissue = 'muscle')
+plt <- scMayoMap.plot(scMayoMap.object = obj, directory = '~/Desktop/', width = 8, height = 6)
+}
+\references{
+Lu Yang, Yan Er Ng, Haipeng Sun, Ying Li, Lucas C. S. Chini, Nathan K. LeBrasseur, Jun Chen & Xu Zhang. Single-cell Mayo Map (scMayoMap): an easy-to-use tool for cell type annotation in single-cell RNA-sequencing data analysis. BMC Biol 21, 223 (2023). https://doi.org/10.1186/s12915-023-01728-6.
+}
+\author{
+Lu Yang
 }
