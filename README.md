@@ -99,5 +99,5 @@ DotPlot(seurat.obj, features = gns)
 
 # 4. References
 If you use scMayoMap, please cite: 
-  - Lu Yang, Yan Er Ng, Haipeng Sun, Ying Li, Nathan LeBrasseur, Jun Chen, Xu Zhang. Single-cell Mayo Map (scMayoMap), an easy-to-use tool for mapping cell types in single-cell RNA-sequencing data analysis. Submitted.
+  - Yang, L., Ng, Y.E., Sun, H. et al. Single-cell Mayo Map (scMayoMap): an easy-to-use tool for cell type annotation in single-cell RNA-sequencing data analysis. BMC Biol 21, 223 (2023). https://doi.org/10.1186/s12915-023-01728-6.
 
